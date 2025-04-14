@@ -18,10 +18,12 @@
         "allowCrossNamespaceImport": {
           "default": false,
           "description": "Allow the Operator to match this resource with Grafanas outside the current namespace",
+          "default": false,
+          "description": "Allow the Operator to match this resource with Grafanas outside the current namespace",
           "type": "boolean"
         },
         "configMapRef": {
-          "description": "dashboard from configmap",
+          "description": "model from configmap",
           "properties": {
             "key": {
               "description": "The key to select.",
@@ -45,12 +47,13 @@
           "additionalProperties": false
         },
         "contentCacheDuration": {
-          "description": "Cache duration for dashboards fetched from URLs",
+          "description": "Cache duration for models fetched from URLs",
           "type": "string"
         },
         "datasources": {
           "description": "maps required data sources to existing ones",
           "items": {
+            "description": "GrafanaResourceDatasource is used to set the datasource name of any templated datasources in\ncontent definitions (e.g., dashboard JSON).",
             "properties": {
               "datasourceName": {
                 "type": "string"
@@ -230,11 +233,12 @@
           "additionalProperties": false
         },
         "gzipJson": {
-          "description": "GzipJson the dashboard's JSON compressed with Gzip. Base64-encoded when in YAML.",
+          "description": "GzipJson the model's JSON compressed with Gzip. Base64-encoded when in YAML.",
           "format": "byte",
           "type": "string"
         },
         "instanceSelector": {
+          "description": "Selects Grafana instances for import",
           "description": "Selects Grafana instances for import",
           "properties": {
             "matchExpressions": {
@@ -282,13 +286,14 @@
           "x-kubernetes-validations": [
             {
               "message": "spec.instanceSelector is immutable",
+              "message": "spec.instanceSelector is immutable",
               "rule": "self == oldSelf"
             }
           ],
           "additionalProperties": false
         },
         "json": {
-          "description": "dashboard json",
+          "description": "model json",
           "type": "string"
         },
         "jsonnet": {
@@ -342,12 +347,13 @@
         "resyncPeriod": {
           "default": "10m0s",
           "description": "How often the resource is synced, defaults to 10m0s if not set",
-          "format": "duration",
           "pattern": "^([0-9]+(\\.[0-9]+)?(ns|us|\u00b5s|ms|s|m|h))+$",
           "type": "string"
         },
         "uid": {
-          "description": "Manually specify the uid for the dashboard, overwrites uids already present in the json model",
+          "description": "Manually specify the uid, overwrites uids already present in the json model.\nCan be any string consisting of alphanumeric characters, - and _ with a maximum length of 40.",
+          "maxLength": 40,
+          "pattern": "^[a-zA-Z0-9-_]+$",
           "type": "string",
           "x-kubernetes-validations": [
             {
@@ -357,11 +363,11 @@
           ]
         },
         "url": {
-          "description": "dashboard url",
+          "description": "model url",
           "type": "string"
         },
         "urlAuthorization": {
-          "description": "authorization options for dashboard from url",
+          "description": "authorization options for model from url",
           "properties": {
             "basicAuth": {
               "properties": {
@@ -442,6 +448,10 @@
         {
           "message": "disabling spec.allowCrossNamespaceImport requires a recreate to ensure desired state",
           "rule": "!oldSelf.allowCrossNamespaceImport || (oldSelf.allowCrossNamespaceImport && self.allowCrossNamespaceImport)"
+        },
+        {
+          "message": "disabling spec.allowCrossNamespaceImport requires a recreate to ensure desired state",
+          "rule": "!oldSelf.allowCrossNamespaceImport || (oldSelf.allowCrossNamespaceImport && self.allowCrossNamespaceImport)"
         }
       ],
       "additionalProperties": false
@@ -454,6 +464,7 @@
           "type": "boolean"
         },
         "conditions": {
+          "description": "Results when synchonizing resource with Grafana instances",
           "description": "Results when synchonizing resource with Grafana instances",
           "items": {
             "description": "Condition contains details for one aspect of the current state of this API Resource.",
@@ -525,6 +536,7 @@
         },
         "lastResync": {
           "description": "Last time the resource was synchronized with Grafana instances",
+          "description": "Last time the resource was synchronized with Grafana instances",
           "format": "date-time",
           "type": "string"
         },
@@ -536,5 +548,8 @@
       "additionalProperties": false
     }
   },
+  "required": [
+    "spec"
+  ],
   "type": "object"
 }
